@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My chat bot</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+
+    <style>
+        body {
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            background-image: url("/static/minecraft.jpg"); /* Chemin vers l'image */
+        }
+        #chat-bot {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            position: relative;
+            text-align: center;
+        }
+        #chat-bot:before {
+            content: '';
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 20px solid #fff;
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #chat-bot h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        #chat-bot p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        #chat-bot input[type="text"] {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            padding: 10px;
+            width: 90%;
+        }
+        #chat-bot button {
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            padding: 10px 20px;
+        }
+        #chat-bot button:hover {
+            background-color: #0069d9;
+        }
+        .message-container {
+            text-align: center; /* Center align to make sure both user and bot messages align properly */
+            margin-top: 20px;
+        }
+
+        .user-message {
+            background-color: #DCF8C6;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: inline-block;
+            text-align: right; /* Align text inside the message to the right */
+            float: right; /* Align the message container to the right */
+            clear: both; /* Clear floats to ensure proper vertical spacing between messages */
+        }
+
+        .bot-message {
+            background-color: #F0F0F0;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: inline-block;
+            text-align: left; /* Align text inside the message to the left */
+            float: left; /* Align the message container to the left */
+            clear: both; /* Clear floats to ensure proper vertical spacing between messages */
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-bot">
+        <h2>My chat bot</h2>
+        <div id="message-area" class="message-container">
+            <p class="bot-message">Hello, ask me your questions about Minecraft!</p>
+        </div>
+        <input id="user-input" type="text" placeholder="Tapez votre message ici...">
+        <button id="send-button">Envoyer</button>
+    </div>
+
+    <script>
+        document.getElementById("send-button").addEventListener("click", function() {
+            var userInput = document.getElementById("user-input").value;
+            if (userInput !== "") {
+                fetch("/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ question: userInput })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    var messageArea = document.getElementById("message-area");
+                    var userMessage = document.createElement("p");
+                    userMessage.className = "user-message";
+                    userMessage.textContent = userInput;
+                    messageArea.appendChild(userMessage);
+
+                    var botMessage = document.createElement("p");
+                    botMessage.className = "bot-message";
+                    botMessage.textContent = data.answer;
+                    messageArea.appendChild(botMessage);
+                })
+                .catch(error => console.error("Error:", error));
+
+                // Clear input after sending
+                document.getElementById("user-input").value = "";
+            }
+        });
+    </script>
+</body>
+</html>
